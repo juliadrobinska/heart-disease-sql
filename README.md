@@ -1,81 +1,103 @@
-# Heart Disease Analysis (SQL, PostgreSQL)
+# Heart Disease Analysis — SQL (PostgreSQL)
 
-This project contains a **SQL-based exploratory data analysis** of the Cleveland Heart Disease dataset.
-
-The goal of the analysis is to understand how selected clinical factors
-(age, cholesterol level, and blood pressure) relate to the presence of heart disease.
-
----
+This project is a **SQL-only exploratory data analysis** of the Cleveland Heart Disease dataset.
+The goal is to identify how selected clinical factors relate to heart disease prevalence.
 
 ## Dataset
 
-Source:
+Source (Kaggle / UCI):
+
 https://www.kaggle.com/datasets/cherngs/heart-disease-cleveland-uci
 
-The dataset is **not included** in this repository.
-Please download it manually from Kaggle.
+> The dataset is not included in the repository.
 
-Target variable:
-- `condition`  
-  - `0` — no heart disease  
-  - `1` — heart disease present  
-
----
-
-## Technologies
+## Tech stack
 
 - PostgreSQL
-- SQL
-- DBeaver (database client)
+- DBeaver
+- SQL (no Python / no modeling)
 
----
+## Project scope
 
-## Analysis overview
+The analysis focuses on:
+- data sanity checks
+- clinically meaningful grouping of features
+- percentage-based comparison of disease prevalence
 
-The analysis is performed entirely in SQL and includes:
+This is **EDA**, not a predictive model.
 
-### 1. Data sanity checks
-- row count
-- missing values
-- min / max values for key numeric columns
-- distribution of the target variable
+## Analysis steps
 
-### 2. Baseline comparisons
+### 1. Data validation
+- row count and preview
+- NULL checks
+- min / max range checks
+- target distribution (`condition`)
+
+### 2. Baseline statistics
 - average age by disease status
 - average cholesterol by disease status
 - average resting blood pressure by disease status
 - disease prevalence by sex
 
-### 3. Clinically meaningful buckets
-Based on common clinical thresholds:
-- Age: `<50`, `50–60`, `>60`
-- Cholesterol: `<200` vs `>=200`
-- Blood pressure: `<140` vs `>=140`
+### 3. Feature bucketing (main analysis)
 
-For each bucket the percentage of patients with heart disease is calculated.
+Clinical features were grouped into meaningful buckets:
 
-### 4. Factor comparison
-For each factor (age, cholesterol, blood pressure) the analysis computes:
-- minimum percentage of sick patients
-- maximum percentage of sick patients
-- **effect_pp** — difference in percentage points between the highest and lowest risk group
+- **Age**
+  - `<50`
+  - `50–60`
+  - `>60`
 
-This allows a simple comparison of which factor shows the strongest association
-with heart disease in this dataset.
+- **Cholesterol**
+  - `<200 mg/dL`
+  - `≥200 mg/dL`
 
----
+- **Resting blood pressure**
+  - `<140 mmHg`
+  - `≥140 mmHg`
+
+For each bucket:
+- total number of patients
+- number of patients with heart disease
+- percentage of patients with heart disease
+
+### 4. Cross-factor comparison
+
+To compare how strongly each factor differentiates disease prevalence:
+- all bucket-level results were combined using `UNION ALL`
+- for each factor, the difference between:
+  - minimum % sick
+  - maximum % sick  
+  was calculated
+
+This value is reported as:
+
+**effect_pp** = difference in percentage points
+
+## Key insight
+
+Among the analyzed factors:
+- **age** shows the strongest differentiation in disease prevalence
+- blood pressure shows a moderate effect
+- cholesterol shows a relatively smaller effect
+
+This does not imply causation — only descriptive relationships.
 
 ## How to run
 
-1. Create a PostgreSQL database (e.g. `heart_disease_sql`)
-2. Create a table `heart_data`
-3. Import the CSV dataset into the table
-4. Run the SQL script top-to-bottom
+1. Create a PostgreSQL database
+2. Import the dataset CSV into a table named `heart_data`
+3. Run the SQL script top-to-bottom
+
+## Limitations
+
+- no statistical testing
+- no confounder control
+- simplified clinical thresholds
+- dataset size is limited
 
 ---
 
-## Notes
+This project demonstrates structured SQL-based reasoning, not medical conclusions.
 
-- This is an exploratory analysis (EDA), not a predictive model.
-- Thresholds are simplified and used for educational purposes.
-- Results should not be treated as medical advice.
